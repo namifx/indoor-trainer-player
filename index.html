@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Indoor Trainer Workout Player - Phase 3</title>
+<style>
+:root{
+  --bg:#ffffff;
+  --panel:#ffffff;
+  --ink:#101827;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --soft:#f8fafc;
+  --orange:#fc5200;
+  --orange2:#ff7a2f;
+  --blue:#00a3ff;
+  --blue2:#e8f7ff;
+  --green:#16a34a;
+  --red:#ef4444;
+  --amber:#f59e0b;
+  --shadow:0 18px 45px rgba(17,24,39,.10);
+  --shadow2:0 10px 25px rgba(252,82,0,.14);
+  --radius:22px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 15% 0%, rgba(252,82,0,.12), transparent 30%),
+    radial-gradient(circle at 90% 8%, rgba(0,163,255,.13), transparent 32%),
+    linear-gradient(180deg,#fff,#f8fafc 60%,#fff);
+  min-height:100vh;
+}
+header{padding:24px}
+.hero{
+  max-width:1280px;
+  margin:0 auto;
+  background:linear-gradient(135deg,#111827,#182235 60%,#0f172a);
+  color:#fff;
+  border-radius:30px;
+  padding:26px;
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+}
+.hero:after{
+  content:"";
+  position:absolute;
+  width:300px;height:300px;border-radius:50%;
+  right:-90px;top:-100px;
+  background:radial-gradient(circle,rgba(252,82,0,.65),transparent 62%);
+}
+.hero h1{margin:0;font-size:32px;letter-spacing:-.04em}
+.hero p{max-width:820px;color:#cbd5e1;line-height:1.5;margin:8px 0 0}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.badge{
+  padding:8px 12px;border-radius:999px;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.16);
+  font-size:13px;
+}
+.app{
+  max-width:1280px;
+  margin:0 auto;
+  padding:0 24px 32px;
+  display:grid;
+  grid-template-columns:330px 1fr;
+  gap:18px;
+}
+.panel{
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(229,231,235,.9);
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:var(--shadow);
+  align-self:start;
+}
+.panel h2{
+  margin:0 0 14px;
+  font-size:18px;
+  letter-spacing:-.03em;
+}
+.card{
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  background:#fff;
+  margin-bottom:12px;
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 14px 28px rgba(15,23,42,.08);
+  border-color:rgba(252,82,0,.35);
+}
+label{font-size:13px;font-weight:800;color:#374151;display:block;margin-bottom:6px}
+input{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  font-size:15px;
+  outline:none;
+  transition:border .15s ease, box-shadow .15s ease;
+}
+input:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 5px rgba(0,163,255,.12);
+}
+button,.file-label{
+  appearance:none;
+  border:0;
+  border-radius:16px;
+  padding:12px 14px;
+  font-weight:900;
+  cursor:pointer;
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
+  color:#fff;
+  box-shadow:var(--shadow2);
+  transition:transform .15s ease, filter .15s ease, box-shadow .15s ease;
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  width:100%;
+}
+button:hover,.file-label:hover{transform:translateY(-2px);filter:saturate(1.08)}
+button:active,.file-label:active{transform:translateY(0)}
+button.secondary{
+  background:linear-gradient(135deg,#0ea5e9,#2563eb);
+  box-shadow:0 10px 25px rgba(0,163,255,.18);
+}
+button.ghost{
+  background:#fff;
+  color:var(--ink);
+  border:1px solid var(--line);
+  box-shadow:none;
+}
+button.danger{
+  background:linear-gradient(135deg,#ef4444,#f97316);
+}
+button.green{
+  background:linear-gradient(135deg,#16a34a,#22c55e);
+  box-shadow:0 10px 25px rgba(22,163,74,.18);
+}
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+input[type=file]{display:none}
+.status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--muted);
+  font-size:13px;
+  margin-top:10px;
+}
+.dot{
+  width:10px;height:10px;border-radius:50%;
+  background:#cbd5e1;
+}
+.dot.ok{background:var(--green);box-shadow:0 0 0 6px rgba(22,163,74,.12)}
+.dot.bad{background:var(--red);box-shadow:0 0 0 6px rgba(239,68,68,.10)}
+.dot.warn{background:var(--amber);box-shadow:0 0 0 6px rgba(245,158,11,.12)}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:18px;
+}
+.metric{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:18px;
+  box-shadow:0 12px 28px rgba(15,23,42,.06);
+  min-height:132px;
+  position:relative;
+  overflow:hidden;
+}
+.metric:after{
+  content:"";
+  position:absolute;
+  width:120px;height:120px;border-radius:50%;
+  right:-45px;bottom:-55px;
+  background:var(--blue2);
+}
+.metric .label{
+  color:var(--muted);
+  font-size:13px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.metric .value{
+  font-size:42px;
+  font-weight:950;
+  letter-spacing:-.05em;
+  margin-top:12px;
+  position:relative;
+  z-index:1;
+}
+.metric .unit{
+  font-size:15px;
+  color:var(--muted);
+  margin-left:4px;
+}
+.main{align-self:start}
+.player{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:18px;
+}
+.timeline,.target-card,.interval-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:16px;
+  box-shadow:var(--shadow);
+}
+canvas{
+  width:100%;
+  height:250px;
+  border-radius:18px;
+  background:linear-gradient(180deg,#f8fafc,#fff);
+  border:1px solid var(--line);
+}
+.controls{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:14px;
+}
+.mini-controls{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+.side-stack{
+  display:grid;
+  gap:18px;
+}
+.target-card{
+  background:#0f172a;
+  color:#fff;
+  position:relative;
+  overflow:hidden;
+}
+.target-card:after{
+  content:"";
+  position:absolute;
+  width:220px;height:220px;border-radius:50%;
+  right:-100px;top:-100px;
+  background:radial-gradient(circle,rgba(252,82,0,.48),transparent 65%);
+}
+.target-card h2{margin:0 0 12px;position:relative;z-index:1}
+.big-target{
+  font-size:58px;
+  font-weight:950;
+  letter-spacing:-.06em;
+  color:#fff;
+  position:relative;
+  z-index:1;
+}
+.subtle{color:#94a3b8;font-size:13px;line-height:1.5;position:relative;z-index:1}
+.feedback{
+  margin-top:12px;
+  padding:12px;
+  border-radius:16px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.10);
+  position:relative;
+  z-index:1;
+}
+.feedback strong{display:block;font-size:15px;margin-bottom:4px}
+.progress-wrap{
+  background:#e5e7eb;
+  height:14px;
+  border-radius:999px;
+  overflow:hidden;
+  margin:12px 0 6px;
+}
+.progress{
+  height:100%;
+  width:0%;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--blue),var(--orange));
+  transition:width .25s linear;
+}
+.block-list{
+  max-height:310px;
+  overflow:auto;
+  padding-right:4px;
+}
+.block-row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  border-bottom:1px solid var(--line);
+  padding:10px 0;
+  font-size:14px;
+}
+.block-row.active{
+  color:var(--orange);
+  font-weight:900;
+}
+.block-row span:last-child{color:var(--muted);text-align:right}
+.block-row.active span:last-child{color:var(--orange)}
+.drop-zone{
+  border:2px dashed rgba(0,163,255,.45);
+  background:#f0f9ff;
+  border-radius:18px;
+  padding:16px;
+  text-align:center;
+  color:#0369a1;
+  font-weight:900;
+  transition:background .15s ease, transform .15s ease;
+  margin-bottom:12px;
+}
+.drop-zone.dragover{
+  background:#dff3ff;
+  transform:scale(1.01);
+}
+.notice{
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  color:#9a3412;
+  padding:12px;
+  border-radius:16px;
+  font-size:13px;
+  line-height:1.45;
+}
+.small{
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.4;
+}
+.kv{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  font-size:14px;
+  padding:8px 0;
+  border-bottom:1px solid var(--line);
+}
+.kv:last-child{border-bottom:0}
+.kv span:last-child{font-weight:900}
+@media(max-width:1080px){
+  .app{grid-template-columns:1fr}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .player{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  header,.app{padding-left:12px;padding-right:12px}
+  .grid{grid-template-columns:1fr}
+  .hero h1{font-size:26px}
+  .controls,.mini-controls{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="hero">
+    <h1>Indoor Trainer Workout Player</h1>
+    <p>Phase 3 adds FTP-based ZWO playback, interval countdowns, actual-vs-target feedback, power bias, skip interval, and ERG-ready target handling.</p>
+    <div class="badges">
+      <div class="badge">Web Bluetooth</div>
+      <div class="badge">Heart Rate Monitor</div>
+      <div class="badge">FTMS Smart Trainer</div>
+      <div class="badge">ZWO Playback</div>
+      <div class="badge">ERG Prep</div>
+    </div>
+  </div>
+</header>
+
+<main class="app">
+  <section class="panel">
+    <h2>Setup</h2>
+
+    <div class="card">
+      <label for="ftpInput">FTP</label>
+      <input id="ftpInput" type="number" value="250" min="50" max="600">
+      <p class="small">ZWO power targets are stored as % FTP. This converts them into real target watts.</p>
+    </div>
+
+    <div class="card">
+      <button id="connectHrBtn">Connect Heart Rate Monitor</button>
+      <div class="status"><span id="hrDot" class="dot"></span><span id="hrStatus">Not connected</span></div>
+    </div>
+
+    <div class="card">
+      <button class="secondary" id="connectTrainerBtn">Connect Smart Trainer</button>
+      <div class="status"><span id="trainerDot" class="dot"></span><span id="trainerStatus">Not connected</span></div>
+    </div>
+
+    <div class="notice">
+      ERG control is prepared but not sending commands yet. The next build can enable FTMS target-power writes once you are ready to test carefully.
+    </div>
+
+    <h2 style="margin-top:20px;">Load Workout</h2>
+    <div class="card">
+      <label class="file-label" for="zwoInput">Load .ZWO File</label>
+      <input id="zwoInput" type="file" accept=".zwo,.xml">
+      <div class="status"><span id="zwoDot" class="dot"></span><span id="zwoStatus">No workout loaded</span></div>
+    </div>
+
+    <div class="card">
+      <button class="ghost" id="demoBtn">Load Demo Workout</button>
+      <p class="small">Use this to test the player without loading a file.</p>
+    </div>
+
+    <h2 style="margin-top:20px;">Workout Summary</h2>
+    <div class="card">
+      <div class="kv"><span>Name</span><span id="summaryName">--</span></div>
+      <div class="kv"><span>Total Time</span><span id="summaryTime">--</span></div>
+      <div class="kv"><span>Blocks</span><span id="summaryBlocks">--</span></div>
+      <div class="kv"><span>Bias</span><span id="summaryBias">100%</span></div>
+    </div>
+  </section>
+
+  <section class="main">
+    <div class="grid">
+      <div class="metric"><div class="label">Heart Rate</div><div class="value"><span id="hrVal">--</span><span class="unit">bpm</span></div></div>
+      <div class="metric"><div class="label">Power</div><div class="value"><span id="powerVal">--</span><span class="unit">w</span></div></div>
+      <div class="metric"><div class="label">Cadence</div><div class="value"><span id="cadenceVal">--</span><span class="unit">rpm</span></div></div>
+      <div class="metric"><div class="label">Speed</div><div class="value"><span id="speedVal">--</span><span class="unit">km/h</span></div></div>
+    </div>
+
+    <div class="player">
+      <div class="timeline">
+        <h2>Workout Timeline</h2>
+        <div id="dropZone" class="drop-zone">Drop a .ZWO file here</div>
+        <canvas id="graph" width="900" height="250"></canvas>
+        <div class="progress-wrap"><div id="progress" class="progress"></div></div>
+        <p class="small"><span id="elapsedText">0:00</span> / <span id="totalText">0:00</span></p>
+        <div class="controls">
+          <button id="startBtn" disabled>Start</button>
+          <button class="ghost" id="pauseBtn" disabled>Pause</button>
+          <button class="danger" id="resetBtn" disabled>Reset</button>
+        </div>
+        <div class="mini-controls">
+          <button class="ghost" id="biasDownBtn" disabled>-5% Bias</button>
+          <button class="secondary" id="skipBtn" disabled>Skip Interval</button>
+          <button class="ghost" id="biasUpBtn" disabled>+5% Bias</button>
+        </div>
+        <div class="mini-controls">
+          <button class="green" id="simBtn" disabled>Simulate Data</button>
+          <button class="ghost" id="ergReadyBtn" disabled>ERG Ready: Off</button>
+          <button class="ghost" id="biasResetBtn" disabled>Reset Bias</button>
+        </div>
+      </div>
+
+      <div class="side-stack">
+        <div class="target-card">
+          <h2>Current Target</h2>
+          <div class="big-target"><span id="targetPower">--</span><span style="font-size:24px">w</span></div>
+          <p class="subtle" id="intervalText">Load a workout to begin.</p>
+          <div class="feedback">
+            <strong id="feedbackTitle">Actual vs Target</strong>
+            <span id="feedbackText" class="subtle">Connect trainer or use simulate mode.</span>
+          </div>
+        </div>
+
+        <div class="interval-card">
+          <h2>Current / Next</h2>
+          <div class="kv"><span>Current</span><span id="currentName">--</span></div>
+          <div class="kv"><span>Remaining</span><span id="remainingText">--</span></div>
+          <div class="kv"><span>Next</span><span id="nextName">--</span></div>
+          <h2 style="margin-top:18px;">Blocks</h2>
+          <div class="block-list" id="blockList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const HR_SERVICE = 0x180D;
+const HR_MEASUREMENT = 0x2A37;
+const FTMS_SERVICE = 0x1826;
+const INDOOR_BIKE_DATA = 0x2AD2;
+
+let workout = [];
+let loadedName = "";
+let startedAt = 0;
+let elapsedBeforePause = 0;
+let playing = false;
+let timer = null;
+let simTimer = null;
+let simOn = false;
+let currentPower = null;
+let bias = 1.0;
+let ergReady = false;
+
+function supportsBluetooth(){ return !!navigator.bluetooth; }
+function ftp(){ return Number($("ftpInput").value || 250); }
+function formatTime(sec){
+  sec = Math.max(0, Math.round(sec));
+  const h = Math.floor(sec/3600);
+  const m = Math.floor((sec%3600)/60);
+  const s = sec%60;
+  if(h>0) return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  return `${m}:${String(s).padStart(2,"0")}`;
+}
+function setStatus(prefix, state, text){
+  let cls = "dot";
+  if(state === "ok") cls += " ok";
+  if(state === "bad") cls += " bad";
+  if(state === "warn") cls += " warn";
+  $(prefix+"Dot").className = cls;
+  $(prefix+"Status").textContent = text;
+}
+function parseHeartRate(value){
+  const flags = value.getUint8(0);
+  const rate16 = flags & 0x1;
+  return rate16 ? value.getUint16(1, true) : value.getUint8(1);
+}
+
+async function connectHR(){
+  if(!supportsBluetooth()){ alert("Web Bluetooth is not available in this browser."); return; }
+  try{
+    const device = await navigator.bluetooth.requestDevice({ filters:[{services:[HR_SERVICE]}] });
+    setStatus("hr", "warn", "Connecting to " + (device.name || "monitor") + "...");
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService(HR_SERVICE);
+    const char = await service.getCharacteristic(HR_MEASUREMENT);
+    await char.startNotifications();
+    char.addEventListener("characteristicvaluechanged", e=>{
+      $("hrVal").textContent = parseHeartRate(e.target.value);
+    });
+    setStatus("hr", "ok", device.name || "Heart-rate monitor connected");
+    device.addEventListener("gattserverdisconnected", ()=>{
+      setStatus("hr", "bad", "Disconnected");
+      $("hrVal").textContent = "--";
+    });
+  }catch(err){
+    console.error(err);
+    setStatus("hr", "bad", "Connection failed or cancelled");
+  }
+}
+
+function parseIndoorBikeData(value){
+  let offset = 0;
+  const flags = value.getUint16(offset, true);
+  offset += 2;
+  let data = {};
+  if(!(flags & 0x0001)){
+    data.speed = value.getUint16(offset, true) / 100;
+    offset += 2;
+  }
+  if(flags & 0x0002) offset += 2;
+  if(flags & 0x0004){
+    data.cadence = value.getUint16(offset, true) / 2;
+    offset += 2;
+  }
+  if(flags & 0x0008) offset += 2;
+  if(flags & 0x0010) offset += 3;
+  if(flags & 0x0020) offset += 2;
+  if(flags & 0x0040){
+    data.power = value.getInt16(offset, true);
+    offset += 2;
+  }
+  return data;
+}
+
+async function connectTrainer(){
+  if(!supportsBluetooth()){ alert("Web Bluetooth is not available in this browser."); return; }
+  try{
+    const device = await navigator.bluetooth.requestDevice({
+      filters:[{services:[FTMS_SERVICE]}],
+      optionalServices:[FTMS_SERVICE]
+    });
+    setStatus("trainer", "warn", "Connecting to " + (device.name || "trainer") + "...");
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService(FTMS_SERVICE);
+    const char = await service.getCharacteristic(INDOOR_BIKE_DATA);
+    await char.startNotifications();
+    char.addEventListener("characteristicvaluechanged", e=>{
+      const data = parseIndoorBikeData(e.target.value);
+      if(Number.isFinite(data.power)){ currentPower = Math.round(data.power); $("powerVal").textContent = currentPower; }
+      if(Number.isFinite(data.cadence)) $("cadenceVal").textContent = Math.round(data.cadence);
+      if(Number.isFinite(data.speed)) $("speedVal").textContent = data.speed.toFixed(1);
+      updateFeedback();
+    });
+    setStatus("trainer", "ok", device.name || "Smart trainer connected");
+    device.addEventListener("gattserverdisconnected", ()=>{
+      setStatus("trainer", "bad", "Disconnected");
+      currentPower = null;
+      $("powerVal").textContent = "--";
+      $("cadenceVal").textContent = "--";
+      $("speedVal").textContent = "--";
+    });
+  }catch(err){
+    console.error(err);
+    setStatus("trainer", "bad", "Connection failed or cancelled");
+  }
+}
+
+function loadDemo(){
+  const demo = `<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+  <name>Demo ZWO Workout</name>
+  <sportType>bike</sportType>
+  <workout>
+    <Warmup Duration="300" PowerLow="0.45" PowerHigh="0.70"/>
+    <SteadyState Duration="360" Power="0.78"/>
+    <IntervalsT Repeat="4" OnDuration="60" OffDuration="60" OnPower="1.10" OffPower="0.55"/>
+    <Cooldown Duration="300" PowerLow="0.65" PowerHigh="0.40"/>
+  </workout>
+</workout_file>`;
+  parseZwo(demo, "Demo ZWO Workout");
+}
+function getAttr(node, name, fallback=null){
+  const v = node.getAttribute(name);
+  return v === null ? fallback : v;
+}
+
+function parseZwo(xmlText, fallbackName="Loaded Workout"){
+  const doc = new DOMParser().parseFromString(xmlText, "application/xml");
+  const parserError = doc.querySelector("parsererror");
+  if(parserError){ alert("Could not read this ZWO file."); return; }
+
+  loadedName = doc.querySelector("name")?.textContent?.trim() || fallbackName;
+  const nodes = Array.from(doc.querySelectorAll("workout > *"));
+  const blocks = [];
+
+  nodes.forEach(n=>{
+    const tag = n.tagName;
+    if(tag === "Warmup" || tag === "Cooldown"){
+      blocks.push({
+        type: tag,
+        duration: Number(getAttr(n,"Duration",0)),
+        low: Number(getAttr(n,"PowerLow",0.5)),
+        high: Number(getAttr(n,"PowerHigh",0.7)),
+        source: tag
+      });
+    }else if(tag === "SteadyState" || tag === "FreeRide"){
+      blocks.push({
+        type: tag,
+        duration: Number(getAttr(n,"Duration",0)),
+        power: Number(getAttr(n,"Power",0.6)),
+        source: tag
+      });
+    }else if(tag === "IntervalsT"){
+      const repeat = Number(getAttr(n,"Repeat",1));
+      const onDur = Number(getAttr(n,"OnDuration",0));
+      const offDur = Number(getAttr(n,"OffDuration",0));
+      for(let i=0;i<repeat;i++){
+        blocks.push({type:`Interval ${i+1} On`, duration:onDur, power:Number(getAttr(n,"OnPower",1.0)), source:"IntervalsT"});
+        blocks.push({type:`Interval ${i+1} Off`, duration:offDur, power:Number(getAttr(n,"OffPower",0.5)), source:"IntervalsT"});
+      }
+    }
+  });
+
+  workout = blocks.filter(b => b.duration > 0);
+  $("zwoStatus").textContent = loadedName + " loaded";
+  $("zwoDot").className = "dot ok";
+  elapsedBeforePause = 0;
+  playing = false;
+  setControls();
+  render();
+}
+
+function totalDuration(){ return workout.reduce((s,b)=>s+b.duration,0); }
+function currentElapsed(){
+  return playing ? (Date.now()-startedAt)/1000 + elapsedBeforePause : elapsedBeforePause;
+}
+function blockAt(seconds){
+  let t = 0;
+  for(let i=0;i<workout.length;i++){
+    const b = workout[i];
+    if(seconds >= t && seconds < t + b.duration){
+      return {block:b, index:i, start:t, end:t+b.duration};
+    }
+    t += b.duration;
+  }
+  return null;
+}
+function targetAt(seconds){
+  const hit = blockAt(seconds);
+  if(!hit) return null;
+  const {block:b,start,end,index} = hit;
+  const local = seconds - start;
+  let pct = b.power;
+  if(b.low !== undefined && b.high !== undefined){
+    const p = Math.max(0, Math.min(1, local / b.duration));
+    pct = b.low + (b.high-b.low)*p;
+  }
+  pct *= bias;
+  return {block:b, index, pct, watts: Math.round(pct * ftp()), start, end};
+}
+function nextBlock(index){
+  return workout[index+1] || null;
+}
+function drawGraph(elapsed=0){
+  const canvas = $("graph");
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+
+  ctx.strokeStyle = "#e5e7eb";
+  ctx.lineWidth = 1;
+  for(let i=1;i<5;i++){
+    const y = i*h/5;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+  }
+
+  const total = Math.max(1,totalDuration());
+  const maxPct = Math.max(1.3, ...workout.map(b=>Math.max(b.power||0,b.low||0,b.high||0))) * 1.15;
+  let x = 0;
+
+  ctx.strokeStyle = "#fc5200";
+  ctx.lineWidth = 4;
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+
+  workout.forEach((b, idx)=>{
+    const x1 = (x/total)*w;
+    const x2 = ((x+b.duration)/total)*w;
+    const p1 = (b.low !== undefined ? b.low : b.power) * bias;
+    const p2 = (b.high !== undefined ? b.high : b.power) * bias;
+    const y1 = h - (p1/maxPct)*(h-28) - 14;
+    const y2 = h - (p2/maxPct)*(h-28) - 14;
+    if(idx===0) ctx.moveTo(x1,y1);
+    else ctx.lineTo(x1,y1);
+    ctx.lineTo(x2,y2);
+    x += b.duration;
+  });
+  ctx.stroke();
+
+  const px = Math.min(w, (elapsed/total)*w);
+  ctx.strokeStyle = "#00a3ff";
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(px,0); ctx.lineTo(px,h); ctx.stroke();
+
+  ctx.fillStyle = "#111827";
+  ctx.font = "13px Arial";
+  ctx.fillText(formatTime(total), w-70, h-12);
+}
+function updateFeedback(){
+  const target = targetAt(currentElapsed());
+  if(!target || currentPower === null){
+    $("feedbackTitle").textContent = "Actual vs Target";
+    $("feedbackText").textContent = "Connect trainer or use simulate mode.";
+    return;
+  }
+  const diff = currentPower - target.watts;
+  const abs = Math.abs(diff);
+  if(abs <= 10){
+    $("feedbackTitle").textContent = "On Target";
+    $("feedbackText").textContent = `${currentPower}w actual / ${target.watts}w target`;
+  }else if(diff > 0){
+    $("feedbackTitle").textContent = `${abs}w Over`;
+    $("feedbackText").textContent = `${currentPower}w actual / ${target.watts}w target`;
+  }else{
+    $("feedbackTitle").textContent = `${abs}w Under`;
+    $("feedbackText").textContent = `${currentPower}w actual / ${target.watts}w target`;
+  }
+}
+function render(){
+  const elapsed = currentElapsed();
+  const total = totalDuration();
+  const target = targetAt(elapsed);
+  drawGraph(elapsed);
+  $("progress").style.width = total ? Math.min(100,(elapsed/total)*100) + "%" : "0%";
+  $("elapsedText").textContent = formatTime(elapsed);
+  $("totalText").textContent = formatTime(total);
+  $("summaryName").textContent = loadedName || "--";
+  $("summaryTime").textContent = total ? formatTime(total) : "--";
+  $("summaryBlocks").textContent = workout.length || "--";
+  $("summaryBias").textContent = Math.round(bias*100) + "%";
+
+  if(target){
+    $("targetPower").textContent = target.watts;
+    $("intervalText").textContent = `${Math.round(target.pct*100)}% FTP • ${formatTime(target.end - elapsed)} remaining • ${loadedName}`;
+    $("currentName").textContent = target.block.type;
+    $("remainingText").textContent = formatTime(target.end - elapsed);
+    const next = nextBlock(target.index);
+    $("nextName").textContent = next ? next.type : "Finish";
+  }else if(workout.length && elapsed >= total){
+    $("targetPower").textContent = "--";
+    $("intervalText").textContent = "Workout complete.";
+    $("currentName").textContent = "Complete";
+    $("remainingText").textContent = "0:00";
+    $("nextName").textContent = "--";
+    pause();
+  }else{
+    $("targetPower").textContent = "--";
+    $("intervalText").textContent = "Load a workout to begin.";
+    $("currentName").textContent = "--";
+    $("remainingText").textContent = "--";
+    $("nextName").textContent = "--";
+  }
+
+  const active = target ? target.index : -1;
+  $("blockList").innerHTML = workout.map((b,i)=>{
+    const min = formatTime(b.duration);
+    const pct = b.low !== undefined ? `${Math.round(b.low*bias*100)}→${Math.round(b.high*bias*100)}%` : `${Math.round((b.power||0)*bias*100)}%`;
+    const watts = b.low !== undefined ? `${Math.round(b.low*bias*ftp())}→${Math.round(b.high*bias*ftp())}w` : `${Math.round((b.power||0)*bias*ftp())}w`;
+    return `<div class="block-row ${i===active ? "active" : ""}"><span>${i+1}. ${b.type}</span><span>${min}<br>${pct} / ${watts}</span></div>`;
+  }).join("");
+
+  updateFeedback();
+}
+function setControls(){
+  const has = workout.length > 0;
+  $("startBtn").disabled = !has || playing;
+  $("pauseBtn").disabled = !playing;
+  $("resetBtn").disabled = !has;
+  $("simBtn").disabled = !has;
+  $("skipBtn").disabled = !has;
+  $("biasDownBtn").disabled = !has;
+  $("biasUpBtn").disabled = !has;
+  $("biasResetBtn").disabled = !has;
+  $("ergReadyBtn").disabled = !has;
+}
+function start(){
+  if(!workout.length || playing) return;
+  playing = true;
+  startedAt = Date.now();
+  timer = setInterval(render, 250);
+  setControls();
+  render();
+}
+function pause(){
+  if(!playing) { setControls(); return; }
+  elapsedBeforePause += (Date.now()-startedAt)/1000;
+  playing = false;
+  clearInterval(timer);
+  setControls();
+  render();
+}
+function reset(){
+  pause();
+  elapsedBeforePause = 0;
+  render();
+}
+function skipInterval(){
+  const hit = blockAt(currentElapsed());
+  if(!hit) return;
+  elapsedBeforePause = hit.end;
+  if(playing) startedAt = Date.now();
+  render();
+}
+function changeBias(delta){
+  bias = Math.max(0.5, Math.min(1.5, bias + delta));
+  render();
+}
+function resetBias(){
+  bias = 1.0;
+  render();
+}
+function toggleErgReady(){
+  ergReady = !ergReady;
+  $("ergReadyBtn").textContent = ergReady ? "ERG Ready: On" : "ERG Ready: Off";
+  $("ergReadyBtn").className = ergReady ? "green" : "ghost";
+}
+function toggleSim(){
+  simOn = !simOn;
+  $("simBtn").textContent = simOn ? "Stop Simulation" : "Simulate Data";
+  if(simOn){
+    simTimer = setInterval(()=>{
+      const t = targetAt(currentElapsed());
+      const targetWatts = t ? t.watts : Math.round(ftp()*0.6);
+      currentPower = Math.max(60, Math.round(targetWatts + (Math.random()*24-12)));
+      $("powerVal").textContent = currentPower;
+      $("cadenceVal").textContent = Math.round(86 + (Math.random()*8-4));
+      $("speedVal").textContent = (30 + (Math.random()*3-1.5)).toFixed(1);
+      $("hrVal").textContent = Math.round(118 + (targetWatts/ftp())*45 + (Math.random()*8-4));
+      updateFeedback();
+    }, 1000);
+  }else{
+    clearInterval(simTimer);
+  }
+}
+function handleFile(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => parseZwo(e.target.result, file.name.replace(/\.(zwo|xml)$/i,""));
+  reader.readAsText(file);
+}
+
+$("connectHrBtn").addEventListener("click", connectHR);
+$("connectTrainerBtn").addEventListener("click", connectTrainer);
+$("demoBtn").addEventListener("click", loadDemo);
+$("zwoInput").addEventListener("change", e=>handleFile(e.target.files[0]));
+$("startBtn").addEventListener("click", start);
+$("pauseBtn").addEventListener("click", pause);
+$("resetBtn").addEventListener("click", reset);
+$("skipBtn").addEventListener("click", skipInterval);
+$("biasDownBtn").addEventListener("click", ()=>changeBias(-0.05));
+$("biasUpBtn").addEventListener("click", ()=>changeBias(0.05));
+$("biasResetBtn").addEventListener("click", resetBias);
+$("ergReadyBtn").addEventListener("click", toggleErgReady);
+$("simBtn").addEventListener("click", toggleSim);
+$("ftpInput").addEventListener("input", render);
+
+const dropZone = $("dropZone");
+dropZone.addEventListener("dragover", e=>{e.preventDefault(); dropZone.classList.add("dragover");});
+dropZone.addEventListener("dragleave", ()=>dropZone.classList.remove("dragover"));
+dropZone.addEventListener("drop", e=>{
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+  handleFile(e.dataTransfer.files[0]);
+});
+
+if(!supportsBluetooth()){
+  setStatus("hr", "bad", "Web Bluetooth unavailable in this browser");
+  setStatus("trainer", "bad", "Web Bluetooth unavailable in this browser");
+}else{
+  setStatus("hr", "", "Not connected");
+  setStatus("trainer", "", "Not connected");
+}
+render();
+setControls();
+</script>
+</body>
+</html>
